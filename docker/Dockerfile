@@ -34,6 +34,7 @@ RUN python3 -m pip install matplotlib
 RUN python3 -m pip install pandas
 RUN python3 -m pip install ipywidgets
 RUN python3 -m pip install transformers
+RUN python3 -m pip install accelerate
 RUN python3 -m pip install datasets
 RUN python3 -m pip install wandb
 
@@ -61,7 +62,7 @@ RUN chown -R ${USER_UID}:${USER_GID} /home/$USER_NAME/
 
 # Change owner of conda/python dir
 # - This is needed to be able to install transformers inside the container using pip -e 
-RUN chown ${USER_UID}:${USER_GID} /opt/conda/lib/python3.6/site-packages/
+RUN chown ${USER_UID}:${USER_GID} /opt/conda/lib/python3.8/site-packages/
 RUN chown -R ${USER_UID}:${USER_GID} /opt/conda/bin/
 
 # Set workdir when starting container
