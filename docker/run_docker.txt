@@ -1,0 +1,59 @@
+docker build -f ./docker/Dockerfile --build-arg USER_UID=$UID --build-arg USER_NAME=$(id -un) -t reproduce-finetuning:latest .
+
+######################
+#     LSV Server     #
+######################
+
+# run docker as user mmosbach for VSCode dev
+docker run -it --rm --runtime=nvidia --pid=host --ipc=host --user mmosbach \
+    --name reproduce-finetuning-dev \
+    -v /nethome/mmosbach/projects/reproduce-finetuning:/reproduce-finetuning \
+    -v /data/users/mmosbach/pre-trained-transformers:/pre-trained-transformers \
+    -v /data/users/mmosbach/datasets:/datasets \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/logfiles:/logfiles \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/checkpoints:/checkpoints \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/tb-logs:/tb-logs \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/wandb-logs:/wandb-logs \
+    reproduce-finetuning:latest
+
+
+# run docker as user mmosbach
+docker run -it --rm --runtime=nvidia --pid=host --ipc=host --user mmosbach \
+    -v /nethome/mmosbach/projects/reproduce-finetuning:/reproduce-finetuning \
+    -v /data/users/mmosbach/pre-trained-transformers:/pre-trained-transformers \
+    -v /data/users/mmosbach/datasets:/datasets \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/logfiles:/logfiles \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/checkpoints:/checkpoints \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/tb-logs:/tb-logs \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/wandb-logs:/wandb-logs \
+    reproduce-finetuning:latest
+
+
+# run docker as user mmosbach
+docker run -it --rm --gpus=all --pid=host --ipc=host --user mmosbach \
+    -v /nethome/mmosbach/projects/reproduce-finetuning:/reproduce-finetuning \
+    -v /data/users/mmosbach/pre-trained-transformers:/pre-trained-transformers \
+    -v /data/users/mmosbach/datasets:/datasets \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/logfiles:/logfiles \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/checkpoints:/checkpoints \
+    -v /data/users/mmosbach/logs/transformers/checkpoints/language-modeling:/checkpoints-transformers \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/tb-logs:/tb-logs \
+    -v /data/users/mmosbach/logs/reproduce-finetuning/wandb-logs:/wandb-logs \
+    reproduce-finetuning:latest
+
+
+######################################
+# Put reproduce-finetuning directory on PYTHONPATH
+######################################
+
+export PYTHONPATH="$PYTHONPATH:/reproduce-finetuning"
+
+######################################
+# Install transformers inside container in editable mode
+######################################
+
+# this needs to be run only once because it will end up on /nethome/mmosbach/reproduce-finetuning
+git clone https://github.com/huggingface/transformers.git
+
+cd transformers
+pip install -e .
